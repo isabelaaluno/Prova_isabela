@@ -141,29 +141,16 @@ class Aluno(db.Model):
     __tablename__ = 'alunos'
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(64), unique=True, index=True)
-    disciplina = db.Column(db.String(30), index=True)
+    disciplina_id = db.Column(db.Integer, db.ForeignKey('disciplinas.id'), nullable=False)
 
-class NameForm(FlaskForm):
+class AlunoForm(FlaskForm):
     name = StringField("Cadastre o novo Aluno:", validators = [DataRequired()])
-    descricao = TextAreaField('Disciplina associada:)', validators = [DataRequired()])
+    disciplina_id = SelectField(u'Disciplina associada:', coerce=int, validators=[DataRequired()])
     submit = SubmitField('Cadastrar')
 
 @app.shell_context_processor
 def make_shell_context():
-    return dict(db=db, User=User, Role=Role)
-
-@app.route('/cursos', methods=['GET','POST'])
-def cadastroCursos():
-    form = NameForm()
-    if form.validate_on_submit():
-        curso = Curso.query.filter_by(nome=form.name.data).first()
-        if curso is None:
-            curso = Curso(nome=form.name.data, descricao=form.descricao.data)
-            db.session.add(curso)
-            db.session.commit()
-        return redirect(url_for('cadastroCursos'))
-    cursos = Curso.query.order_by(Curso.nome).all()
-    return render_template('cadastroCursos.html', form=form, cursos=cursos)
+    return dict(db=db, User=User, Role=Role, Aluno=Aluno, Disciplina=Disciplina)
 
 @app.route('/')
 def index():
