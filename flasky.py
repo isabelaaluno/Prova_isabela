@@ -137,15 +137,15 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
-class Curso(db.Model):
-    __tablename__ = 'cursos'
+class Aluno(db.Model):
+    __tablename__ = 'alunos'
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(64), unique=True, index=True)
-    descricao = db.Column(db.String(250), index=True)
+    disciplina = db.Column(db.String(30), index=True)
 
 class NameForm(FlaskForm):
-    name = StringField("Qual é o nome do curso?", validators = [DataRequired()])
-    descricao = TextAreaField('Descrição (250 caracteres)', validators = [DataRequired()])
+    name = StringField("Cadastre o novo Aluno:", validators = [DataRequired()])
+    descricao = TextAreaField('Disciplina associada:)', validators = [DataRequired()])
     submit = SubmitField('Cadastrar')
 
 @app.shell_context_processor
