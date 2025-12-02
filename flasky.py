@@ -141,11 +141,19 @@ class Aluno(db.Model):
     __tablename__ = 'alunos'
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(64), unique=True, index=True)
-    disciplina_id = db.Column(db.Integer, db.ForeignKey('disciplinas.id'), nullable=False)
+    disciplina = db.Column(db.Integer, db.ForeignKey('disciplinas.id'), nullable=False)
 
 class AlunoForm(FlaskForm):
     name = StringField("Cadastre o novo Aluno:", validators = [DataRequired()])
-    disciplina_id = SelectField(u'Disciplina associada:', coerce=int, validators=[DataRequired()])
+    DISCIPLINA_CHOICES = [
+        ('DSWA5', 'DSWA5'),
+        ('TCOA5', 'TCOA5'),
+        ('PJIA5', 'PJIA5'),
+        ('SODA5', 'SODA5'),
+        ('BDD01', 'BDD01'),
+        ('SEGI7', 'SEGI7'),
+    ]
+    disciplina = SelectField(u'Disciplina associada:', coerce=DISCIPLINA_CHOICES, validators=[DataRequired()])
     submit = SubmitField('Cadastrar')
 
 @app.shell_context_processor
