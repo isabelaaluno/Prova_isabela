@@ -10,24 +10,26 @@
 </style>
 
 {% block page_content %}
-<div class="scroll">
-    {{ wtf.quick_form(form) }}
-    <h2>Relação de cursos cadastrados</h2>
-    {% if cursos %}
-        <table class='table'>
-            <thead>
-                <th>Curso</th>
-                <th>Descrição</th>
-            </thead>
-            <tbody>
-                {% for i in cursos %}
-                    <tr>
-                        <td><b>{{ i.nome }}</b></td>
-                        <td>{{ i.descricao }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
+<div class="page-header">
+
 </div>
+{{ wtf.quick_form(form) }}
+
+<h2>relação de alunos cadastrados</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>aluno</th>
+            <th>disciplina</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for key in alunos_all %}
+        <tr>
+            <td>{{ key.nome }}</td>
+            <td>{{ key.disc }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
