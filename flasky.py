@@ -45,11 +45,21 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
+class Disciplina(db.Model):
+    __tablename__ = 'disciplinas'
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(64), unique=True, index=True)
+    alunos = db.relationship('Aluno', backref='disciplina_rel', lazy='dynamic')
+
+    def __repr__(self):
+        return '<Disciplina %r>' % self.nome
+
 class Aluno(db.Model):
     __tablename__ = 'alunos'
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(64), unique=True, index=True)
-    disciplina = db.Column(db.Colum(db.String(64),db.ForeignKey(disciplina.nome))
+    disciplina_nome = db.Column(db.String(64), db.ForeignKey('disciplinas.nome'))
+    disciplina = db.Column(db.String(64), nullable=True) 
 
     def __repr__(self):
         return '<Aluno %r>' % self.nome
@@ -64,7 +74,7 @@ class AlunoForm(FlaskForm):
         ('BDD01', 'BDD01'),
         ('SEGI7', 'SEGI7'),
     ]
-    disciplina = SelectField(u'Disciplina associada:', coerce=DISCIPLINA_CHOICES, validators=[DataRequired()])
+    disciplina = SelectField(u'Disciplina associada:', choices=DISCIPLINA_CHOICES, validators=[DataRequired()])
     submit = SubmitField('Cadastrar')
 
 @app.shell_context_processor
@@ -90,19 +100,26 @@ def indisponivel():
 @app.route('/alunos', methods=['GET', 'POST'])
 def cadastro_alunos():
     form = AlunoForm()
-    alunos_all = Aluno.query.order_by(Aluno.nome).all();
-    print(alunos_all);
+    
     if form.validate_on_submit():
         aluno = Aluno.query.filter_by(nome=form.name.data).first()
+        
         if aluno is None:
-            aluno_disc = Disc.query.filter_by(name=form.disc.data).first();
-            aluno = Aluno(nome=form.name.data, disc_name=aluno_disc);
+            disciplina_selecionada = form.disciplina.data
+            
+            disciplina_db = Disciplina.query.filter_by(nome=disciplina_selecionada).first()
+            if disciplina_db is None:
+                disciplina_db = Disciplina(nome=disciplina_selecionada)
+                db.session.add(disciplina_db)
+            
+            aluno = Aluno(nome=form.name.data, disciplina_nome=disciplina_selecionada, disciplina=disciplina_selecionada)
             db.session.add(aluno)
             db.session.commit()
-            session['known'] = False
+            flash(f'Aluno "{aluno.nome}" cadastrado com sucesso!')
+            return redirect(url_for('cadastro_alunos'))
         else:
-            session['known'] = True
-        session['name'] = form.name.data
-        return redirect(url_for('index'))
-    return render_template('index.html', form=form,
-                           alunos_all=alunos_all);
+            flash(f'Erro: O aluno "{form.name.data}" já está cadastrado.', 'danger')
+    
+    alunos_all = Aluno.query.order_by(Aluno.nome).all()
+    
+    return render_template('cadastroAlunos.html', form=form, alunos_all=alunos_all)
