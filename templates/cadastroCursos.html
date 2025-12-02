@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Avaliação semestral{% endblock %}
+
+<style>
+    .scroll {
+      overflow-y: auto;
+    }
+</style>
+
+{% block page_content %}
+<div class="scroll">
+    {{ wtf.quick_form(form) }}
+    <h2>Relação de cursos cadastrados</h2>
+    {% if cursos %}
+        <table class='table'>
+            <thead>
+                <th>Curso</th>
+                <th>Descrição</th>
+            </thead>
+            <tbody>
+                {% for i in cursos %}
+                    <tr>
+                        <td><b>{{ i.nome }}</b></td>
+                        <td>{{ i.descricao }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+{% endblock %}
