@@ -11,23 +11,23 @@
 
 {% block page_content %}
 <div class="page-header">
-
+    <h1>Cadastro de Alunos</h1>
 </div>
 {{ wtf.quick_form(form) }}
 
-<h2>relação de alunos cadastrados</h2>
+<h2>Relação de Alunos Cadastrados</h2>
 <table class="table">
     <thead>
         <tr>
-            <th>aluno</th>
-            <th>disciplina</th>
+            <th>Nome do Aluno</th>
+            <th>Disciplina</th>
         </tr>
     </thead>
     <tbody>
-        {% for key in alunos_all %}
+        {% for aluno in alunos_all %}
         <tr>
-            <td>{{ key.nome }}</td>
-            <td>{{ key.disc }}</td>
+            <td>{{ aluno.nome }}</td>
+            <td>{{ aluno.disciplina }}</td>
         </tr>
         {% endfor %}
     </tbody>
