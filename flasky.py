@@ -3,12 +3,10 @@
 from flask import Flask, render_template
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
-from flask import request
-from flask import make_response
-from flask import redirect, url_for, flash, session
+from flask import redirect, url_for, flash
 from datetime import datetime
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, SelectField, PasswordField, TextAreaField
+from wtforms import StringField, SubmitField, SelectField
 from wtforms.validators import DataRequired
 import os
 from flask_sqlalchemy import SQLAlchemy
@@ -16,7 +14,7 @@ from flask_migrate import Migrate
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='app/templates', static_folder='app/static')
 bootstrap = Bootstrap(app)
 moment = Moment(app)
 
@@ -59,7 +57,7 @@ class Aluno(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(64), unique=True, index=True)
     disciplina_nome = db.Column(db.String(64), db.ForeignKey('disciplinas.nome'))
-    disciplina = db.Column(db.String(64), nullable=True) 
+    disciplina = db.Column(db.String(64), nullable=True)
 
     def __repr__(self):
         return '<Aluno %r>' % self.nome
@@ -100,18 +98,18 @@ def indisponivel():
 @app.route('/alunos', methods=['GET', 'POST'])
 def cadastro_alunos():
     form = AlunoForm()
-    
+
     if form.validate_on_submit():
         aluno = Aluno.query.filter_by(nome=form.name.data).first()
-        
+
         if aluno is None:
             disciplina_selecionada = form.disciplina.data
-            
+
             disciplina_db = Disciplina.query.filter_by(nome=disciplina_selecionada).first()
             if disciplina_db is None:
                 disciplina_db = Disciplina(nome=disciplina_selecionada)
                 db.session.add(disciplina_db)
-            
+
             aluno = Aluno(nome=form.name.data, disciplina_nome=disciplina_selecionada, disciplina=disciplina_selecionada)
             db.session.add(aluno)
             db.session.commit()
@@ -119,7 +117,7 @@ def cadastro_alunos():
             return redirect(url_for('cadastro_alunos'))
         else:
             flash(f'Erro: O aluno "{form.name.data}" já está cadastrado.', 'danger')
-    
+
     alunos_all = Aluno.query.order_by(Aluno.nome).all()
-    
+
     return render_template('cadastroAlunos.html', form=form, alunos_all=alunos_all)
